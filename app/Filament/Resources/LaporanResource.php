@@ -28,6 +28,7 @@ class LaporanResource extends Resource
     protected static ?string $navigationLabel = 'Laporan';
     protected static ?string $pluralLabel = 'Laporan';
     protected static ?string $slug = 'laporan';
+    protected static ?string $title = 'laporan';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -59,17 +60,16 @@ class LaporanResource extends Resource
                     ->reactive()
                     ->disabled(fn ($livewire) => $livewire instanceof ViewRecord) // Disable status di View
                     ->afterStateUpdated(function ($state, $set) {
-                        // Menambahkan styling warna pada status
                         $color = match ($state) {
                             'pending' => 'gray',
                             'approved' => 'blue',
                             'rejected' => 'red',
                             'completed' => 'green',
                         };
-                        $set('status_color', $color); // Simpan warna status di field tersembunyi
+                        $set('status_color', $color);
                     }),
                 Forms\Components\TextInput::make('status_color')
-                    ->hidden() // Menyembunyikan warna status
+                    ->hidden()
             ]);
     }
 
@@ -104,7 +104,6 @@ class LaporanResource extends Resource
                         'completed' => 'success',
                         'rejected' => 'danger',
                     }),
-                
                 Tables\Columns\TextColumn::make('created_at')
                     ->searchable()
                     ->dateTime('d M Y')

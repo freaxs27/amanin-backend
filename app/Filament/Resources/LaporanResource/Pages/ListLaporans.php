@@ -26,4 +26,9 @@ class ListLaporans extends ListRecords
         ];
     }
 
+    public function getTitle(): string
+    {
+        return 'Daftar Laporan';
+    }
+
 }
