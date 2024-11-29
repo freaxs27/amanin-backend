@@ -18,12 +18,9 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
 {
     public function collection()
     {
-        $laporans = Laporan::all('id', 'image', 'title', 'description', 'status', 'created_at', 'updated_at');
+        $laporans = Laporan::all('id', 'user_id' ,'image', 'description', 'datetime', 'status');
 
-        foreach ($laporans as $laporan) {
-            $laporan->created_at = $laporan->created_at->format('Y-m-d');
-            $laporan->updated_at = $laporan->updated_at->format('Y-m-d');
-        }
+        
 
         return $laporans;
     }
@@ -31,7 +28,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
     public function headings(): array
     {
         return [
-            'ID', 'Image', 'Judul', 'Deskripsi', 'Status', 'Tanggal Dibuat', 'Tanggal Diubah'
+            'ID', 'Username', 'Image', 'Description', 'Datetime', 'Status'
         ];
     }
 
@@ -39,11 +36,11 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
     {
         return [
             'A' => 10,
-            'B' => 50,  
-            'C' => 30,
+            'B' => 20,  
+            'C' => 50,
             'D' => 50,
-            'E' => 20,
-            'F' => 20,
+            'E' => 50,
+            // 'F' => 20,
         ];
     }
     
@@ -104,7 +101,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
                 $drawing->setHeight(90);
     
                 $row = $index + 2;
-                $drawing->setCoordinates("B{$row}");
+                $drawing->setCoordinates("C{$row}");
     
                 $drawings[] = $drawing;
             }

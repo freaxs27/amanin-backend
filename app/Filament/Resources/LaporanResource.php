@@ -5,9 +5,19 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LaporanResource\Pages;
 use App\Filament\Resources\LaporanResource\RelationManagers;
 use App\Models\Laporan;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Split;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\TimePicker;
 use Filament\Resources\Resource;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables;
@@ -24,47 +34,45 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 class LaporanResource extends Resource
 {
     protected static ?string $model = Laporan::class;
-    protected static ?string $navigationGroup = 'Laporan';
+    // app/Filament/Resources/LaporanResource.php
+    public static function getNavigationGroup(): string
+    {
+        return 'Reports';
+    }
+    public static function getNavigationSort(): int
+    {
+        return 1;
+    }
+
     protected static ?string $navigationLabel = 'Laporan';
+
     protected static ?string $pluralLabel = 'Laporan';
+
     protected static ?string $slug = 'laporan';
+
     protected static ?string $title = 'laporan';
+    
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpan(2),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->maxLength(65535)
-                    ->columnSpan(2),
-                Forms\Components\FileUpload::make('image')
-                    ->image()
-                    ->required()
-                    ->columnSpan(2)
-                    ->preserveFilenames(),
-                    Forms\Components\Select::make('status')
+                Forms\Components\Select::make('status')
                     ->options([
                         'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                        'completed' => 'Completed',
+                        'diproses' => 'Diproses',
+                        'selesai' => 'Selesai',
                     ])
                     ->label('Status')
                     ->required()
                     ->reactive()
-                    ->disabled(fn ($livewire) => $livewire instanceof ViewRecord) // Disable status di View
+                    ->disabled(fn ($livewire) => $livewire instanceof ViewRecord) 
                     ->afterStateUpdated(function ($state, $set) {
                         $color = match ($state) {
                             'pending' => 'gray',
-                            'approved' => 'blue',
-                            'rejected' => 'red',
-                            'completed' => 'green',
+                            'diproses' => 'warning',
+                            'selesai' => 'success',
                         };
                         $set('status_color', $color);
                     }),
@@ -73,47 +81,91 @@ class LaporanResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('Laporan')
+                    ->schema([
+                        Split::make([
+                            Grid::make(2)
+                                ->schema([
+                                    Group::make([
+                                        TextEntry::make('id')
+                                            ->label('ID laporan'),
+                                        TextEntry::make('status')
+                                            ->badge()
+                                            ->color(fn (string $state): string => match ($state) {
+                                                'pending' => 'gray',
+                                                'diproses' => 'warning',
+                                                'selesai' => 'success',
+                                            }),
+                                    ]),
+                                    Group::make([
+                                        TextEntry::make('user.username')
+                                            ->label('Uploaded by'),
+                                        TextEntry::make('datetime')
+                                            ->dateTime('d M Y')
+                                            ->badge()
+                                            ->label("Tanggal Diupload")
+                                            ->color('success'),  
+                                    ]),
+                                ]),
+                                ImageEntry::make('image')
+                                    ->hiddenLabel()
+                                    ->height(200)
+                                    ->grow(false),
+                        ])->from('lg'),
+
+                    ]),
+               Section::make('Description')
+                    ->schema([
+                        TextEntry::make('description')
+                            ->prose()
+                            ->markdown()
+                            ->hiddenLabel(),
+                    ])
+                    ->collapsible(),
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('index')
-                    ->label('#')
-                    ->width(50)
-                    ->rowIndex(),
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ,
+                Tables\Columns\TextColumn::make('user.username')
+                    ->label('User')
+                    ->sortable(),
                 Tables\Columns\ImageColumn::make('image')
                     ->searchable()
-                    ->width(200)
                     ->height(200)
-                    ->label('Gambar'),
-                Tables\Columns\TextColumn::make('title')
-                    ->searchable()
-                    ->sortable()
-                    ->label('Judul'),
+                    ->label('Image'),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->sortable()
-                    ->label('Deskripsi'),
+                    ->label('Description'),
+                Tables\Columns\TextColumn::make('Coordinate')
+                    ->searchable()
+                    ->sortable()
+                    ->label('Coordinate'),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable()
                     ->sortable('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'gray',
-                        'approved' => 'primary',
-                        'completed' => 'success',
-                        'rejected' => 'danger',
+                        'diproses' => 'warning',
+                        'selesai' => 'success',
                     }),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('datetime')
                     ->searchable()
                     ->dateTime('d M Y')
-                    ->label('Tanggal Dibuat')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->searchable()
-                    ->dateTime('d M Y')
-                    ->label('Tanggal Diubah')
-                    ->sortable(),       
+                    ->label('Date')
+                    ->sortable(),    
             ])
             ->defaultSort('updated_at', 'desc')
             ->emptyStateHeading('Tidak ada laporan yang ditemukan')
@@ -121,9 +173,8 @@ class LaporanResource extends Resource
                 SelectFilter::make('status')
                     ->options([
                         'pending' => 'Pending',
-                        'approved' => 'Approved',                       
-                        'rejected' => 'Rejected',
-                        'completed' => 'Completed',
+                        'diproses' => 'Diproses',                       
+                        'selesai' => 'Selesai',
                     ])
                     ->label('Status')
             ])
@@ -132,18 +183,19 @@ class LaporanResource extends Resource
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()
-                        ->requiresConfirmation(),                
-                    
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make('export_bulk'),
+                    ExportBulkAction::make('export_bulk')
+                    ->modalWidth('lg'),
                 ]),
             ])
             ->recordAction(null);
     }
+
 
     public static function getRelations(): array
     {
@@ -158,6 +210,7 @@ class LaporanResource extends Resource
             'index' => Pages\ListLaporans::route('/'),
             // 'create' => Pages\CreateLaporan::route('/create'),
             'edit' => Pages\EditLaporan::route('/{record}/edit'),
+            'view' => Pages\ViewLaporan::route('/{record}'),
         ];
     }
 }

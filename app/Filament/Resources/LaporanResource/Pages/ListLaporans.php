@@ -22,13 +22,8 @@ class ListLaporans extends ListRecords
             ->action(function () {
                 return Excel::download(new LaporanExport, 'laporan_all.xlsx');
             }),
-            // Actions\CreateAction::make(),
+            Actions\CreateAction::make(),
         ];
-    }
-
-    public function getTitle(): string
-    {
-        return 'Daftar Laporan';
     }
 
 }
