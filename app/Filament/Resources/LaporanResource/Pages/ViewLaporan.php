@@ -18,6 +18,9 @@ class ViewLaporan extends ViewRecord
                 ->action(function () {
                     return redirect()->route('filament.admin.resources.laporan.index');
                 }),
+            Actions\DeleteAction::make()
+                ->requiresConfirmation()
+                ->color('danger'),
         ];
     }
 }

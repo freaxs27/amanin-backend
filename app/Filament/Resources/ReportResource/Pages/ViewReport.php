@@ -18,6 +18,9 @@ class ViewReport extends ViewRecord
                 ->action(function () {
                     return redirect()->route('filament.admin.resources.reports.index');
                 }),
+            Actions\DeleteAction::make()
+                ->requiresConfirmation()
+                ->color('danger'),
         ];
     }
 }

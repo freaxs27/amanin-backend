@@ -11,18 +11,24 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet; 
-use Maatwebsite\Excel\Sheet;
 use Illuminate\Support\Facades\Storage;
 
 class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, WithStyles, WithTitle, WithDrawings
 {
     public function collection()
     {
-        $laporans = Laporan::all('id', 'user_id' ,'image', 'description', 'datetime', 'status');
-
-        
-
-        return $laporans;
+        $laporans = Laporan::with('user')->get();
+    
+        return $laporans->map(function ($laporan) {
+            return [
+                'id' => $laporan->id,
+                'username' => $laporan->user ? $laporan->user->username : '-',
+                'image' => '',
+                'description' => $laporan->description,
+                'datetime' => $laporan->datetime,
+                'status' => $laporan->status,
+            ];
+        });
     }
 
     public function headings(): array
@@ -40,15 +46,9 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
             'C' => 50,
             'D' => 50,
             'E' => 50,
-            // 'F' => 20,
         ];
     }
     
-    public function columnHeight(): int
-    {
-        return 60;
-    }
-
     public function styles(Worksheet $sheet)
     {
         $laporans = Laporan::all();
@@ -72,11 +72,6 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
                 'fill' => [
                     'fillType' => 'solid',
                     'startColor' => ['argb' => '4CAF50'],
-                ],
-            ],
-            'B' => [
-                'font' => [
-                    'color' => ['argb' => 'FFFFFF'],
                 ],
             ],
         ];

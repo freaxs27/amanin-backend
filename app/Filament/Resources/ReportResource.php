@@ -62,12 +62,11 @@ class ReportResource extends Resource
                     ->label('ID')
                     ->sortable()
                     ,
-                Tables\Columns\ImageColumn::make('laporan.image')
-                    ->label('Image')
-                    ->height(200)
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('user.username')
                     ->label('User')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('laporan.description')
+                    ->label('Laporan Description')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()  
@@ -86,16 +85,11 @@ class ReportResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make()
-                        ->requiresConfirmation(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make('export_bulk')
-                    ->modalWidth('lg'),
                 ]),
             ])
             ->recordAction(null);
@@ -113,7 +107,7 @@ class ReportResource extends Resource
                                     Group::make([
                                         TextEntry::make('id')
                                             ->label('ID Report'),
-                                        TextEntry::make('status')
+                                        TextEntry::make('laporan.status')
                                             ->badge()
                                             ->color(fn (string $state): string => match ($state) {
                                                 'pending' => 'gray',
@@ -127,7 +121,7 @@ class ReportResource extends Resource
                                         TextEntry::make('datetime')
                                             ->dateTime('d M Y')
                                             ->badge()
-                                            ->label("Tanggal Diupload")
+                                            ->label("Tanggal")
                                             ->color('success'),  
                                     ]),
                                 ]),
@@ -136,16 +130,30 @@ class ReportResource extends Resource
                                     ->height(200)
                                     ->grow(false),
                         ])->from('lg'),
-
                     ]),
-               Section::make('Description')
+                Section::make('Description')
                     ->schema([
-                        TextEntry::make('description')
-                            ->prose()
-                            ->markdown()
-                            ->hiddenLabel(),
+                        Split::make([
+                            Grid::make(2)
+                                ->schema([
+                                    Group::make([
+                                        TextEntry::make('description')
+                                            ->label("Report Description")
+                                            ->prose()
+                                            ->markdown(),
+                                    ]),
+                                    Group::make([
+                                        TextEntry::make('laporan.description')
+                                            ->label('Laporan Description')
+                                            ->prose()
+                                            ->markdown(),
+                                    ]),
+                                ]),
+                        ])->from('lg'),
+
                     ])
                     ->collapsible(),
+
             ]);
     }
 
