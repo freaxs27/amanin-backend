@@ -25,6 +25,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Support\HtmlString;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -93,6 +94,11 @@ class LaporanResource extends Resource
                                     Group::make([
                                         TextEntry::make('id')
                                             ->label('ID laporan'),
+                                        TextEntry::make('datetime')
+                                            ->dateTime('d M Y')
+                                            ->badge()
+                                            ->label("Tanggal Diupload")
+                                            ->color('success'), 
                                         TextEntry::make('status')
                                             ->badge()
                                             ->color(fn (string $state): string => match ($state) {
@@ -103,12 +109,27 @@ class LaporanResource extends Resource
                                     ]),
                                     Group::make([
                                         TextEntry::make('user.username')
-                                            ->label('Uploaded by'),
-                                        TextEntry::make('datetime')
-                                            ->dateTime('d M Y')
-                                            ->badge()
-                                            ->label("Tanggal Diupload")
-                                            ->color('success'),  
+                                            ->label('Uploaded by'), 
+                                        TextEntry::make('lokasi_kejadian')
+                                            ->label('Lokasi Kejadian'),
+                                        TextEntry::make('')
+                                            ->label('Link Maps')
+                                            ->url(function ($record) {
+                                                if ($record->latitude && $record->longitude) {
+                                                    return "https://www.google.com/maps/place/{$record->latitude},{$record->longitude}";
+                                                }
+                                                return null;
+                                            })
+                                            ->openUrlInNewTab()
+                                            ->view('infolists.components.coordinate', [
+                                                'record' => function ($record) {
+                                                    return $record;
+                                                },
+                                            ]),
+                                        
+                                                
+                                        
+                                        
                                     ]),
                                 ]),
                                 ImageEntry::make('image')
@@ -128,6 +149,7 @@ class LaporanResource extends Resource
                     ->collapsible(),
             ]);
     }
+    
 
     public static function table(Table $table): Table
     {
@@ -135,8 +157,7 @@ class LaporanResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
-                    ->sortable()
-                    ,
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.username')
                     ->label('User')
                     ->sortable(),
@@ -144,14 +165,32 @@ class LaporanResource extends Resource
                     ->searchable()
                     ->height(200)
                     ->label('Image'),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('Jenis Kriminalitas')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->sortable()
+                    ->words(3)
                     ->label('Description'),
-                Tables\Columns\TextColumn::make('Coordinate')
+                Tables\Columns\TextColumn::make('lokasi_kejadian')
                     ->searchable()
                     ->sortable()
-                    ->label('Coordinate'),
+                    ->words(2)
+                    ->label('Lokasi'),
+                Tables\Columns\TextColumn::make('coordinate')
+                    ->label('Coordinate')
+                    ->formatStateUsing(fn ($state, $record) => $record->latitude && $record->longitude 
+                        ? "Lat: {$record->latitude}, Long: {$record->longitude}" 
+                        : 'Tidak tersedia'
+                    )
+                    ->url(fn ($record) => $record->latitude && $record->longitude 
+                        ? "https://www.google.com/maps/place/{$record->latitude},{$record->longitude}"
+                        : null, 
+                        shouldOpenInNewTab: true
+                    )
+                    ->description('Klik untuk melihat lokasi di Google Maps')
+                    ->view('tables.columns.coordinate'),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable()
                     ->sortable('status')

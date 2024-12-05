@@ -14,16 +14,17 @@ class Laporan extends Model
         'user_id',
         'description',
         'image',
+        'lokasi_kejadian',
         'latitude',
         'longitude',
         'datetime',
         'status',
     ];
 
-    // Model Laporan.php
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
 
 }

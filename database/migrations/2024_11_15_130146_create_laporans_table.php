@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('laporans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('title');
             $table->text('description');
             $table->string('image');
+            $table->string('lokasi_kejadian');
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
             $table->date('datetime');
@@ -30,6 +32,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('laporans');
+        Schema::table('laporans', function (Blueprint $table) {
+            $table->dropColumn(['latitude', 'longitude']);
+        });
     }
 };

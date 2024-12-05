@@ -65,8 +65,8 @@ class ReportResource extends Resource
                 Tables\Columns\TextColumn::make('user.username')
                     ->label('User')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('laporan.description')
-                    ->label('Laporan Description')
+                Tables\Columns\TextColumn::make('laporan.title')
+                    ->label('Jenis Laporan')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()  
@@ -78,7 +78,7 @@ class ReportResource extends Resource
                     ->label('Tanggal'),   
             ])
             ->defaultSort('updated_at', 'desc')
-            ->emptyStateHeading('Tidak ada laporan yang ditemukan')
+            ->emptyStateHeading('Tidak ada Reports yang ditemukan')
             ->filters([
                 
             ])
