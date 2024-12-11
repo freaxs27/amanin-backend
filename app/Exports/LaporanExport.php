@@ -24,7 +24,9 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
                 'id' => $laporan->id,
                 'username' => $laporan->user ? $laporan->user->username : '-',
                 'image' => '',
+                'title' => $laporan->title,
                 'description' => $laporan->description,
+                'lokasi_kejadian' => $laporan->lokasi_kejadian,
                 'datetime' => $laporan->datetime,
                 'status' => $laporan->status,
             ];
@@ -34,7 +36,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
     public function headings(): array
     {
         return [
-            'ID', 'Username', 'Image', 'Description', 'Datetime', 'Status'
+            'ID', 'Username', 'Image','Jenis Kriminalitas', 'Description', 'Lokasi Kejadian', 'Datetime', 'Status'
         ];
     }
 
@@ -44,8 +46,11 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
             'A' => 10,
             'B' => 20,  
             'C' => 50,
-            'D' => 50,
+            'D' => 20,
             'E' => 50,
+            'F' => 20,
+            'G' => 20,
+            'H' => 20,
         ];
     }
     
@@ -60,7 +65,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
 
         return [
             1    => ['font' => ['bold' => true]],
-            'A1:F1' => [
+            'A1:H1' => [
                 'alignment' => [
                     'horizontal' => 'center',
                     'vertical' => 'center',
@@ -71,7 +76,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithColumnWidths, W
                 ],
                 'fill' => [
                     'fillType' => 'solid',
-                    'startColor' => ['argb' => '4CAF50'],
+                    'startColor' => ['argb' => '007bff'],
                 ],
             ],
         ];

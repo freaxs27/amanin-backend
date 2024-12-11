@@ -13,7 +13,11 @@ class EditLaporan extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\Action::make('back')
+                ->label('Back') 
+                ->action(function () {
+                    return redirect()->route('filament.admin.resources.laporan.index');
+                }),
         ];
     }
 }

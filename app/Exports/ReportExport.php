@@ -24,7 +24,7 @@ class ReportExport implements FromCollection, WithHeadings, WithColumnWidths, Wi
             return [
                 'id' => $report->id,
                 'username' => $report->user ? $report->user->username : '-',
-                'laporan_description' => $report->laporan ? $report->laporan->description : '-',
+                'title' => $report->laporan ? $report->laporan->title : '-',
                 'description' => $report->description,
                 'datetime' => $report->datetime,
                 'status' => $report->laporan ? $report->laporan->status : '-',
@@ -35,7 +35,7 @@ class ReportExport implements FromCollection, WithHeadings, WithColumnWidths, Wi
     public function headings(): array
     {
         return [
-            'ID', 'Username', 'Laporan Description', 'Report Description', 'Datetime', 'Status'
+            'ID', 'Username', 'Jenis Kriminalitas', 'Description', 'Datetime', 'Status'
         ];
     }
 
@@ -44,7 +44,7 @@ class ReportExport implements FromCollection, WithHeadings, WithColumnWidths, Wi
         return [
             'A' => 10,
             'B' => 20,  
-            'C' => 50,
+            'C' => 20,
             'D' => 50,
             'E' => 20,
             'E' => 20,
@@ -73,7 +73,7 @@ class ReportExport implements FromCollection, WithHeadings, WithColumnWidths, Wi
                 ],
                 'fill' => [
                     'fillType' => 'solid',
-                    'startColor' => ['argb' => '4CAF50'],
+                    'startColor' => ['argb' => '007bff'],
                 ],
             ],
         ];

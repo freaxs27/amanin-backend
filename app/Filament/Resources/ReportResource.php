@@ -5,6 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Filament\Resources\ReportResource\RelationManagers;
 use App\Models\Report;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -12,29 +20,12 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Split;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\TimePicker;
-use Filament\Resources\Resource;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\SelectColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 
 class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
-
     public static function getNavigationGroup(): string
     {
         return 'Reports';
@@ -43,16 +34,7 @@ class ReportResource extends Resource
     {
         return 2;
     }
-
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
 
     public static function table(Table $table): Table
     {
@@ -60,17 +42,28 @@ class ReportResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
-                    ->sortable()
-                    ,
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.username')
                     ->label('User')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('laporan.title')
-                    ->label('Jenis Laporan')
-                    ->sortable(),
+                    ->label('Jenis Kriminalitas')
+                    ->searchable()
+                    ->sortable()
+                    ->wrap()
+                    ->extraAttributes([
+                        'style' => 'white-space: normal; word-wrap: break-word;'
+                    ]),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()  
-                    ->label('Description'),
+                    ->sortable()
+                    ->label('Deskripsi')
+                    ->wrap()
+                    ->extraAttributes([
+                        'style' => 'white-space: normal; word-wrap: break-word;'
+                    ]),
                 Tables\Columns\TextColumn::make('datetime')
                     ->searchable()
                     ->dateTime('d M Y')
@@ -78,13 +71,15 @@ class ReportResource extends Resource
                     ->label('Tanggal'),   
             ])
             ->defaultSort('updated_at', 'desc')
-            ->emptyStateHeading('Tidak ada Reports yang ditemukan')
+            ->emptyStateHeading('Tidak ada Report yang ditemukan')
             ->filters([
                 
             ])
             ->actions([
                 ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\ViewAction::make()
+                        ->color('primary'),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
@@ -94,7 +89,7 @@ class ReportResource extends Resource
             ])
             ->recordAction(null);
     }
-    
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -168,17 +163,10 @@ class ReportResource extends Resource
     {
         return [
             'index' => Pages\ListReports::route('/'),
-            'create' => Pages\CreateReport::route('/create'),
-            'edit' => Pages\EditReport::route('/{record}/edit'),
+            // 'create' => Pages\CreateReport::route('/create'),
+            // 'edit' => Pages\EditReport::route('/{record}/edit'),
             'view' => Pages\ViewReport::route('/{record}/view'),
+
         ];
     }
 }
-/*************  ✨ Codeium Command ⭐  *************/
-/******  19cc463e-c5c6-409b-8982-910db612f309  *******//**
- * Returns an array of page routes for the Report resource.
- *
- * The array includes routes for listing, creating, and editing reports.
- *
- * @return array An associative array with page keys and their corresponding routes.
- */

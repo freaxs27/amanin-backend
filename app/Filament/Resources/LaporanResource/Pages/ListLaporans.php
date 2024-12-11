@@ -19,7 +19,7 @@ class ListLaporans extends ListRecords
         return [
             Actions\Action::make('export_all')
                 ->label('Export')
-                ->color('success')
+                ->color('primary')
                 ->action(function () {
                     $filePath = 'exports/laporan_all.xlsx';
                     Excel::store(new LaporanExport, $filePath, 'public');
@@ -42,4 +42,3 @@ class ListLaporans extends ListRecords
         ];
     }
 }
-

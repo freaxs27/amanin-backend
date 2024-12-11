@@ -4,10 +4,10 @@
             /* CSS */
             .button-3 {
                 appearance: none;
-                background-color: #2ea44f;
-                border: 1px solid rgba(27, 31, 35, .15);
+                background-color: #007bff; /* Primary Blue */
+                border: 1px solid rgba(0, 123, 255, .15); /* Primary Border */
                 border-radius: 6px;
-                box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
+                box-shadow: rgba(0, 123, 255, .1) 0 1px 0;
                 box-sizing: border-box;
                 color: #fff;
                 cursor: pointer;
@@ -26,31 +26,31 @@
                 vertical-align: middle;
                 white-space: nowrap;
             }
-    
+
             .button-3:focus:not(:focus-visible):not(.focus-visible) {
                 box-shadow: none;
                 outline: none;
             }
-    
+
             .button-3:hover {
-                background-color: #2c974b;
+                background-color: #0056b3; /* Darker Primary */
             }
-    
+
             .button-3:focus {
-                box-shadow: rgba(46, 164, 79, .4) 0 0 0 3px;
+                box-shadow: rgba(0, 123, 255, .4) 0 0 0 3px; /* Focus Outline */
                 outline: none;
             }
-    
+
             .button-3:disabled {
-                background-color: #94d3a2;
-                border-color: rgba(27, 31, 35, .1);
+                background-color: #80bdff; /* Light Primary */
+                border-color: rgba(0, 123, 255, .1);
                 color: rgba(255, 255, 255, .8);
                 cursor: default;
             }
-    
+
             .button-3:active {
-                background-color: #298e46;
-                box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
+                background-color: #004085; /* Darkest Primary */
+                box-shadow: rgba(0, 70, 130, .2) 0 1px 0 inset;
             }
         </style>
         

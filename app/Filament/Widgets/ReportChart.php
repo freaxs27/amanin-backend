@@ -11,7 +11,9 @@ use Carbon\Carbon;
 class ReportChart extends ChartWidget
 {
     protected static ?string $heading = 'Report per month';
-
+    protected static string $color = 'primary';
+    protected static ?int $sort = 3;
+    
     protected function getData(): array
     {
         $data = Trend::model(Report::class)

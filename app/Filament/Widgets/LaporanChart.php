@@ -8,9 +8,11 @@ use Flowframe\Trend\TrendValue;
 use App\Models\Laporan;
 use Carbon\Carbon;  
 
-class MonthlyChart extends ChartWidget
+class LaporanChart extends ChartWidget
 {
     protected static ?string $heading = 'Laporan per month';
+    protected static string $color = 'primary';
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {

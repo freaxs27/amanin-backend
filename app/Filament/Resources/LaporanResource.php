@@ -5,6 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LaporanResource\Pages;
 use App\Filament\Resources\LaporanResource\RelationManagers;
 use App\Models\Laporan;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -12,30 +20,12 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Split;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\TimePicker;
-use Filament\Resources\Resource;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Columns\SelectColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Support\HtmlString;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 
 class LaporanResource extends Resource
 {
     protected static ?string $model = Laporan::class;
-    // app/Filament/Resources/LaporanResource.php
     public static function getNavigationGroup(): string
     {
         return 'Reports';
@@ -44,15 +34,10 @@ class LaporanResource extends Resource
     {
         return 1;
     }
-
     protected static ?string $navigationLabel = 'Laporan';
-
     protected static ?string $pluralLabel = 'Laporan';
-
     protected static ?string $slug = 'laporan';
-
     protected static ?string $title = 'laporan';
-    
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -76,155 +61,167 @@ class LaporanResource extends Resource
                             'selesai' => 'success',
                         };
                         $set('status_color', $color);
-                    }),
-                Forms\Components\TextInput::make('status_color')
-                    ->hidden()
+                    }),          
             ]);
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
-            ->schema([
-                Section::make('Laporan')
-                    ->schema([
-                        Split::make([
-                            Grid::make(2)
-                                ->schema([
-                                    Group::make([
-                                        TextEntry::make('id')
-                                            ->label('ID laporan'),
-                                        TextEntry::make('datetime')
-                                            ->dateTime('d M Y')
-                                            ->badge()
-                                            ->label("Tanggal Diupload")
-                                            ->color('success'), 
-                                        TextEntry::make('status')
-                                            ->badge()
-                                            ->color(fn (string $state): string => match ($state) {
-                                                'pending' => 'gray',
-                                                'diproses' => 'warning',
-                                                'selesai' => 'success',
-                                            }),
-                                    ]),
-                                    Group::make([
-                                        TextEntry::make('user.username')
-                                            ->label('Uploaded by'), 
-                                        TextEntry::make('lokasi_kejadian')
-                                            ->label('Lokasi Kejadian'),
-                                        TextEntry::make('')
-                                            ->label('Link Maps')
-                                            ->url(function ($record) {
-                                                if ($record->latitude && $record->longitude) {
-                                                    return "https://www.google.com/maps/place/{$record->latitude},{$record->longitude}";
-                                                }
-                                                return null;
-                                            })
-                                            ->openUrlInNewTab()
-                                            ->view('infolists.components.coordinate', [
-                                                'record' => function ($record) {
-                                                    return $record;
-                                                },
-                                            ]),
-                                        
-                                                
-                                        
-                                        
-                                    ]),
+        ->schema([
+            Section::make('Laporan')
+                ->schema([
+                    Split::make([
+                        Grid::make(2)
+                            ->schema([
+                                Group::make([
+                                    TextEntry::make('id')
+                                        ->label('ID laporan'),
+                                    TextEntry::make('datetime')
+                                        ->dateTime('d M Y')
+                                        ->badge()
+                                        ->label("Tanggal Diupload")
+                                        ->color('success'), 
+                                    TextEntry::make('status')
+                                        ->badge()
+                                        ->color(fn (string $state): string => match ($state) {
+                                            'pending' => 'gray',
+                                            'diproses' => 'warning',
+                                            'selesai' => 'success',
+                                        }),
                                 ]),
-                                ImageEntry::make('image')
-                                    ->hiddenLabel()
-                                    ->height(200)
-                                    ->grow(false),
-                        ])->from('lg'),
+                                Group::make([
+                                    TextEntry::make('user.username')
+                                        ->label('Uploaded by'), 
+                                    TextEntry::make('lokasi_kejadian')
+                                        ->label('Lokasi Kejadian'),
+                                    TextEntry::make('')
+                                        ->label('Link Maps')
+                                        ->url(function ($record) {
+                                            if ($record->latitude && $record->longitude) {
+                                                return "https://www.google.com/maps/place/{$record->latitude},{$record->longitude}";
+                                            }
+                                            return null;
+                                        })
+                                        ->openUrlInNewTab()
+                                        ->view('infolists.components.coordinate', [
+                                            'record' => function ($record) {
+                                                return $record;
+                                            },
+                                        ]),
+                                ]),
+                            ]),
+                            ImageEntry::make('image')
+                                ->hiddenLabel()
+                                ->height(200)
+                                ->grow(false),
+                    ])->from('lg'),
 
-                    ]),
-               Section::make('Description')
-                    ->schema([
-                        TextEntry::make('description')
-                            ->prose()
-                            ->markdown()
-                            ->hiddenLabel(),
-                    ])
-                    ->collapsible(),
-            ]);
+                ]),
+           Section::make('Description')
+                ->schema([
+                    TextEntry::make('description')
+                        ->prose()
+                        ->markdown()
+                        ->hiddenLabel(),
+                ])
+                ->collapsible(),
+        ]);
     }
-    
 
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('user.username')
-                    ->label('User')
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('image')
-                    ->searchable()
-                    ->height(200)
-                    ->label('Image'),
-                Tables\Columns\TextColumn::make('title')
-                    ->label('Jenis Kriminalitas')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->searchable()
-                    ->sortable()
-                    ->words(3)
-                    ->label('Description'),
-                Tables\Columns\TextColumn::make('lokasi_kejadian')
-                    ->searchable()
-                    ->sortable()
-                    ->words(2)
-                    ->label('Lokasi'),
-                Tables\Columns\TextColumn::make('coordinate')
-                    ->label('Coordinate')
-                    ->formatStateUsing(fn ($state, $record) => $record->latitude && $record->longitude 
-                        ? "Lat: {$record->latitude}, Long: {$record->longitude}" 
-                        : 'Tidak tersedia'
-                    )
-                    ->url(fn ($record) => $record->latitude && $record->longitude 
-                        ? "https://www.google.com/maps/place/{$record->latitude},{$record->longitude}"
-                        : null, 
-                        shouldOpenInNewTab: true
-                    )
-                    ->description('Klik untuk melihat lokasi di Google Maps')
-                    ->view('tables.columns.coordinate'),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable()
-                    ->sortable('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'gray',
-                        'diproses' => 'warning',
-                        'selesai' => 'success',
-                    }),
-                Tables\Columns\TextColumn::make('datetime')
-                    ->searchable()
-                    ->dateTime('d M Y')
-                    ->label('Date')
-                    ->sortable(),    
-            ])
-            ->defaultSort('updated_at', 'desc')
-            ->emptyStateHeading('Tidak ada laporan yang ditemukan')
-            ->filters([
-
-            ])
-            ->actions([
-                ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
+        ->columns([
+            Tables\Columns\TextColumn::make('id')
+                ->label('ID')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('user.username')
+                ->label('User')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\ImageColumn::make('image')
+                ->searchable()
+                ->height(200)
+                ->label('Gambar'),
+            Tables\Columns\TextColumn::make('title')
+                ->label('Jenis Kriminalitas')
+                ->searchable()
+                ->sortable()
+                ->wrap()
+                ->extraAttributes([
+                    'style' => 'white-space: normal; word-wrap: break-word;'
                 ]),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            Tables\Columns\TextColumn::make('description')
+                ->searchable()
+                ->sortable()
+                ->label('Deskripsi')
+                ->wrap()
+                ->extraAttributes([
+                    'style' => 'white-space: normal; word-wrap: break-word;'
                 ]),
-            ])
-            ->recordAction(null);
+            Tables\Columns\TextColumn::make('lokasi_kejadian')
+                ->searchable()
+                ->sortable()
+                ->words(2)
+                ->label('Lokasi')
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('coordinate')
+                ->label('Koordinat')
+                ->formatStateUsing(fn ($state, $record) => $record->latitude && $record->longitude 
+                    ? "Lat: {$record->latitude}, Long: {$record->longitude}" 
+                    : 'Tidak tersedia'
+                )
+                ->url(fn ($record) => $record->latitude && $record->longitude 
+                    ? "https://www.google.com/maps/place/{$record->latitude},{$record->longitude}"
+                    : null, 
+                    shouldOpenInNewTab: true
+                )
+                ->description('Klik untuk melihat lokasi di Google Maps')
+                ->view('tables.columns.coordinate'),
+            Tables\Columns\TextColumn::make('status')
+                ->searchable()
+                ->sortable('status')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'pending' => 'gray',
+                    'diproses' => 'warning',
+                    'selesai' => 'success',
+                }),
+            Tables\Columns\TextColumn::make('datetime')
+                ->searchable()
+                ->dateTime('d M Y')
+                ->label('Tanggal')
+                ->sortable(),   
+        ])
+        ->defaultSort('updated_at', 'desc')
+        ->emptyStateHeading('Tidak ada laporan yang ditemukan')
+        ->filters([
+            SelectFilter::make('status')
+                ->options([
+                    'pending' => 'Pending',
+                    'diproses' => 'Diproses',
+                    'selesai' => 'Selesai',
+                ])
+                ->label('Status'),
+        ])
+        ->actions([
+            ActionGroup::make([
+                Tables\Actions\ViewAction::make()
+                    ->color('primary'),
+                Tables\Actions\EditAction::make()
+                    ->color('warning'),
+                Tables\Actions\DeleteAction::make(),
+            ]),
+        ])
+        ->bulkActions([
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]),
+        ])
+        ->recordAction(null);
     }
-
 
     public static function getRelations(): array
     {
@@ -239,7 +236,7 @@ class LaporanResource extends Resource
             'index' => Pages\ListLaporans::route('/'),
             // 'create' => Pages\CreateLaporan::route('/create'),
             'edit' => Pages\EditLaporan::route('/{record}/edit'),
-            'view' => Pages\ViewLaporan::route('/{record}'),
+            'view' => Pages\ViewLaporan::route('/{record}/view'),
         ];
     }
 }

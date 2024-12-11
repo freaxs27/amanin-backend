@@ -8,4 +8,3 @@ class Coordinate extends Column
 {
     protected string $view = 'tables.columns.coordinate';
 }
-
